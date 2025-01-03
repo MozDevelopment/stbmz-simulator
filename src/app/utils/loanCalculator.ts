@@ -1,6 +1,6 @@
 // Source: src/app/utils/loancalculator.ts
 
-import { addMonths, format } from "date-fns";
+import { addMonths } from "date-fns";
 
 export interface LoanConfig {
   interestRate: number; // Taxa de juro anual (%)

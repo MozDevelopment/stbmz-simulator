@@ -29,6 +29,7 @@ import {
   ChevronLeft,
   Download,
   Eye,
+  ArrowLeft,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -45,6 +46,7 @@ interface SimulationSummaryProps {
   simulationData: SimulationFormData;
   loanSummary: LoanSummary;
   onContinue: () => void;
+  onBack: () => void;
 }
 
 const ROWS_PER_PAGE = 12;
@@ -53,6 +55,7 @@ export function SimulationSummary({
   simulationData,
   loanSummary,
   onContinue,
+  onBack,
 }: SimulationSummaryProps) {
   const t = useTranslations("SimulationResults");
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -188,13 +191,24 @@ export function SimulationSummary({
           />
           <label
             htmlFor="terms"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${!termsAccepted ? "text-red-500 font-bold" : ""}`}
           >
             {t("acceptTerms")}
           </label>
         </div>
+        {!termsAccepted && (
+          <p className="mt-2 text-sm text-red-500">{t("acceptTermsWarning")}</p>
+        )}
       </CardContent>
       <CardFooter className="flex justify-between">
+        <Button
+          onClick={onBack}
+          variant="outline"
+          className="flex items-center space-x-2"
+        >
+          <ArrowLeft size={18} />
+          <span>{t("backToForm")}</span>
+        </Button>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>

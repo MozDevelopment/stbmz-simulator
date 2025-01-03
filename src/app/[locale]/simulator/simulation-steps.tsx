@@ -12,16 +12,15 @@ import { PersonalInfoForm } from "./components/personal-info-form";
 import { motion, AnimatePresence } from "framer-motion";
 import { SimulationFormData, SimulatorFormProps } from "./types";
 import { calculateLoan } from "@/app/utils/loanCalculations";
-import { toast } from "sonner";
 import { LoanSummary } from "@/app/utils/loanCalculator";
+import { toast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 // Define explicit types for better type safety
 type SimulationStep = 1 | 2 | 3;
+type StepStatus = "pending" | "in-progress" | "completed" | "error";
 
-type StepStatusState = Record<
-  SimulationStep,
-  "in-progress" | "pending" | "completed"
->;
+type StepStatusState = Record<SimulationStep, StepStatus>;
 
 const ANIMATION_DURATION = 0.3;
 
@@ -29,6 +28,22 @@ const stepAnimationVariants = {
   initial: { opacity: 0, x: -20 },
   animate: { opacity: 1, x: 0 },
   exit: { opacity: 0, x: 20 },
+};
+
+/**
+ * Get the appropriate status class for step indicators
+ */
+const getStepStatusClass = (status: StepStatus): string => {
+  switch (status) {
+    case "completed":
+      return "bg-primary text-primary-foreground ring-2 ring-primary";
+    case "in-progress":
+      return "bg-primary text-primary-foreground animate-pulse";
+    case "error":
+      return "bg-destructive text-destructive-foreground ring-2 ring-destructive";
+    default:
+      return "bg-muted text-muted-foreground";
+  }
 };
 
 /**
@@ -46,37 +61,70 @@ export function SimulationSteps() {
     3: "pending",
   });
 
+  // const { toast } = useToast();
+
   const updateStepStatus = (
     currentStep: SimulationStep,
-    status: "completed",
+    status: StepStatus,
     nextStep?: SimulationStep,
   ) => {
-    setStepStatus({ ...stepStatus, [currentStep]: status });
+    setStepStatus((prev) => ({ ...prev, [currentStep]: status }));
     if (nextStep) {
       setStep(nextStep);
+      setStepStatus((prev) => ({ ...prev, [nextStep]: "in-progress" }));
     }
   };
 
   const handleSimulationComplete: SimulatorFormProps["onSimulationComplete"] = (
     data,
   ) => {
-    setSimulationData(data);
-    const summary = calculateLoan(data);
-    setLoanSummary(summary);
-    updateStepStatus(1, "completed", 2);
+    try {
+      const summary = calculateLoan(data);
+      setSimulationData(data);
+      setLoanSummary(summary);
+      updateStepStatus(1, "completed", 2);
+      toast({
+        title: t("simulationSuccess"),
+        description: t("proceedToSummary"),
+        variant: "default",
+      });
+    } catch (error) {
+      console.log(error);
+      updateStepStatus(1, "error");
+      toast({
+        title: t("calculationError"),
+        description: t("tryAgainLater"),
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSummaryComplete = () => {
     updateStepStatus(2, "completed", 3);
+    toast({
+      title: t("summaryReviewed"),
+      description: t("proceedToSubmission"),
+      variant: "default",
+    });
   };
 
   const handleSendComplete = () => {
-    toast.success(t("simulationSent"));
-    resetSimulation();
+    updateStepStatus(3, "completed");
+    toast({
+      title: t("simulationSent"),
+      description: t("thankYou"),
+      variant: "default",
+    });
+    setTimeout(resetSimulation, 3000);
   };
 
-  const handleValidationError = () => {
-    toast.error(t("validationError"));
+  const handleValidationError = (errorMessage?: string) => {
+    updateStepStatus(1, "error");
+    toast({
+      title: t("validationError"),
+      description: errorMessage || t("checkFields"),
+      variant: "destructive",
+    });
   };
 
   const resetSimulation = () => {
@@ -94,16 +142,26 @@ export function SimulationSteps() {
     return (currentStep / 3) * 100;
   };
 
+  const handleBack = () => {
+    updateStepStatus(2, "pending", 1); // Navigate back to step 1
+  };
+
   const StepIndicator = ({ stepNumber }: { stepNumber: SimulationStep }) => (
-    <div
-      className={`flex flex-col items-center ${step >= stepNumber ? "text-primary" : "text-muted-foreground"}`}
-    >
+    <div className="flex flex-col items-center">
       <div
-        className={`w-8 h-8 rounded-full flex items-center justify-center ${step >= stepNumber ? "bg-primary text-primary-foreground" : "bg-muted"}`}
+        className={cn(
+          "w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200",
+          getStepStatusClass(stepStatus[stepNumber]),
+        )}
+        role="status"
+        aria-label={`Step ${stepNumber}: ${stepStatus[stepNumber]}`}
       >
         {stepNumber}
       </div>
-      <span className="mt-2 text-sm">{t(`step${stepNumber}`)}</span>
+      <span className="mt-2 text-sm font-medium">{t(`step${stepNumber}`)}</span>
+      <span className="text-xs text-muted-foreground">
+        {t(`step${stepNumber}Status.${stepStatus[stepNumber]}`)}
+      </span>
     </div>
   );
 
@@ -125,6 +183,7 @@ export function SimulationSteps() {
           simulationData={simulationData}
           loanSummary={loanSummary}
           onContinue={handleSummaryComplete}
+          onBack={handleBack}
         />
       );
     }
@@ -143,7 +202,13 @@ export function SimulationSteps() {
   return (
     <Card className="w-full max-w-4xl mx-auto">
       <CardContent className="pt-6">
-        <div className="mb-8">
+        <div
+          className="mb-8"
+          role="progressbar"
+          aria-valuenow={calculateProgress(step)}
+          aria-valuemin={0}
+          aria-valuemax={100}
+        >
           <Progress value={calculateProgress(step)} className="w-full" />
         </div>
 
