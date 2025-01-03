@@ -2,9 +2,7 @@
 
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
-
 import { ValidLocale } from "@/i18n/types";
-
 import { Toaster } from "@/components/ui/toaster";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
@@ -40,10 +38,12 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale}>
-      <NextIntlClientProvider messages={messages}>
-        {children}
-        <Toaster />
-      </NextIntlClientProvider>
+      <body>
+        <NextIntlClientProvider messages={messages}>
+          {children}
+          <Toaster />
+        </NextIntlClientProvider>
+      </body>
     </html>
   );
 }

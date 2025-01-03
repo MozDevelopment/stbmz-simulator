@@ -1,4 +1,4 @@
-// Source: src/app/[locale]/simulator/components/simulation-steps.tsx
+// Source: src/app/[locale]/simulator/simulation-steps.tsx
 
 "use client";
 
@@ -51,6 +51,7 @@ const getStepStatusClass = (status: StepStatus): string => {
  */
 export function SimulationSteps() {
   const t = useTranslations("SimulationSteps");
+
   const [step, setStep] = useState<SimulationStep>(1);
   const [simulationData, setSimulationData] =
     useState<SimulationFormData | null>(null);
