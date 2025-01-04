@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useForm } from "react-hook-form";
+import { FieldErrors, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
@@ -39,12 +39,20 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { z } from "zod";
-
+import { useSearchParams } from "next/navigation";
 export function PersonalInfoForm({
   onSimulationComplete,
   onValidationError,
 }: SimulatorFormProps) {
   const t = useTranslations("SimulatorForm");
+
+  const searchParams = useSearchParams();
+
+  const queryProductType = searchParams.get("productType") || "personalLoan";
+
+  const productType = queryProductType as string;
+  console.info(productType);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -54,7 +62,7 @@ export function PersonalInfoForm({
       monthlyIncome: 0,
       otherIncome: 0,
       requestedAmount: 0,
-      productType: "personal",
+      productType: "personalLoan",
       term: 12,
       includeInsurance: false,
       initialContribution: 0,
@@ -73,6 +81,27 @@ export function PersonalInfoForm({
     onSimulationComplete(values);
   }
 
+  function onError(errors: FieldErrors<z.infer<typeof formSchema>>) {
+    // Convert errors object to a string message
+    const errorMessage = Object.entries(errors)
+      .map(([field, error]) => `${field}: ${error?.message}`)
+      .join(", ");
+    onValidationError(errorMessage);
+  }
+
+  /**
+   * Resets the form fields to their default values.
+   */
+
+  /*************  ✨ Codeium Command ⭐  *************/
+  /**
+   * Resets the form fields to their default values.
+   *
+   * This function calls the useForm `reset` method, which will reset the form
+   * fields to the values specified in the `defaultValues` prop of the useForm
+   * hook, or to an empty object if no `defaultValues` were specified.
+   */
+  /******  f599fd09-146c-489d-ba0d-61bebe63da0a  *******/
   function resetForm() {
     form.reset();
   }
@@ -80,7 +109,7 @@ export function PersonalInfoForm({
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit, onValidationError)}
+        onSubmit={form.handleSubmit(onSubmit, onError)}
         className="space-y-6"
       >
         <FormField
@@ -230,17 +259,21 @@ export function PersonalInfoForm({
                 <div className="relative">
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    defaultValue={productType}
                   >
                     <FormControl>
                       <SelectTrigger className="pl-10">
                         <SelectValue placeholder={t("selectProductType")} />
                       </SelectTrigger>
                     </FormControl>
+
                     <SelectContent>
                       {PRODUCT_TYPES.map((type) => (
-                        <SelectItem key={type.value} value={type.value}>
-                          {t(type.value)}
+                        <SelectItem
+                          key={`product-type-${type.value}`}
+                          value={type.value}
+                        >
+                          {type.label}
                         </SelectItem>
                       ))}
                     </SelectContent>

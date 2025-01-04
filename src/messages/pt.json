@@ -3,6 +3,20 @@
     "title": "Simulador Financeiro",
     "description": "Simule diferentes tipos de produtos financeiros de forma rápida e fácil"
   },
+  "Simulators": {
+    "title": "Simulador de Empréstimos",
+    "description": "Escolha o tipo de empréstimo que deseja simular",
+    "simulators": {
+      "vehicleLoan": "Financiamento de Veículos",
+      "vehicleLoanDescription": "Financie seu próximo veículo",
+      "homeLoan": "Financiamento Imobiliário",
+      "homeLoanDescription": "Calcule as parcelas do seu imóvel",
+      "businessLoan": "Empréstimo Empresarial",
+      "businessLoanDescription": "Faça seu negócio crescer",
+      "personalLoan": "Empréstimo Pessoal",
+      "personalLoanDescription": "Financie suas necessidades"
+    }
+  },
   "SimulationSteps": {
     "step1": "Informações Pessoais",
     "step2": "Resumo da Simulação",

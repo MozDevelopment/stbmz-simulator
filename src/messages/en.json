@@ -3,6 +3,20 @@
     "title": "Financial Simulator",
     "description": "Simulate different types of financial products quickly and easily"
   },
+  "Simulators": {
+    "title": "Loan Simulator",
+    "description": "Choose the type of loan you want to simulate",
+    "simulators": {
+      "vehicleLoan": "Vehicle Loan",
+      "vehicleLoanDescription": "Finance your next car",
+      "homeLoan": "Home Loan",
+      "homeLoanDescription": "Calculate home loan payments",
+      "businessLoan": "Business Loan",
+      "businessLoanDescription": "Grow your business",
+      "personalLoan": "Personal Loan",
+      "personalLoanDescription": "Finance your needs"
+    }
+  },
   "SimulationSteps": {
     "step1": "Personal Information",
     "step2": "Simulation Summary",

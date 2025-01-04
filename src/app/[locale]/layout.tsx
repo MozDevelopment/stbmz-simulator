@@ -1,11 +1,11 @@
-//app/[locale]/layout.tsx
+//Source: src/app/[locale]/layout.tsx
 
-import { notFound } from "next/navigation";
+import { Toaster } from "@/components/ui/toaster";
 import { routing } from "@/i18n/routing";
 import { ValidLocale } from "@/i18n/types";
-import { Toaster } from "@/components/ui/toaster";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
+import { notFound } from "next/navigation";
 
 /**
  * The root layout of the app that wraps each page.
@@ -22,28 +22,30 @@ import { getMessages } from "next-intl/server";
 
 export default async function LocaleLayout({
   children,
-  params: { locale },
+  params: paramsPromise,
 }: {
   children: React.ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
+  // Await the params to resolve
+  const params = await paramsPromise;
+  const locale = params.locale;
+
   // Ensure that the incoming `locale` is valid
-  if (!locale || !routing.locales.includes(locale as ValidLocale)) {
+  if (!routing.locales.includes(locale as ValidLocale)) {
     notFound();
   }
+
   // Providing all messages to the client
   // side is the easiest way to get started
-
   const messages = await getMessages();
 
   return (
-    <html lang={locale}>
-      <body>
-        <NextIntlClientProvider messages={messages}>
-          {children}
-          <Toaster />
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <body>
+      <NextIntlClientProvider locale={locale} messages={messages}>
+        {children}
+      </NextIntlClientProvider>
+      <Toaster />
+    </body>
   );
 }

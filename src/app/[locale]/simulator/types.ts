@@ -6,10 +6,10 @@ import * as z from "zod";
 export type SimulationFormData = z.infer<typeof formSchema>;
 
 export const PRODUCT_TYPES = [
-  { value: "personal", label: "Crédito Pessoal" },
-  { value: "housing", label: "Crédito Habitação" },
-  { value: "mobileLease", label: "Leasing Mobiliário" },
-  { value: "propertyLease", label: "Leasing Imobiliário" },
+  { value: "personalLoan", label: "Crédito Pessoal" },
+  { value: "homeLoan", label: "Crédito Habitação" },
+  { value: "vehicleLoan", label: "Leasing Mobiliário" },
+  { value: "businessLoan", label: "Leasing Imobiliário" },
 ] as const;
 
 export interface FormInputFieldProps {
@@ -22,7 +22,7 @@ export interface FormInputFieldProps {
 
 export interface SimulatorFormProps {
   onSimulationComplete: (values: SimulationFormData) => void;
-  onValidationError: () => void;
+  onValidationError: (errorMessage: string) => void;
 }
 
 export const formSchema = z.object({
@@ -32,7 +32,12 @@ export const formSchema = z.object({
   monthlyIncome: z.number().min(1, "Rendimento mensal é obrigatório"),
   otherIncome: z.number().optional(),
   requestedAmount: z.number().min(1, "Montante é obrigatório"),
-  productType: z.enum(["personal", "housing", "mobileLease", "propertyLease"]),
+  productType: z.enum([
+    "personalLoan",
+    "homeLoan",
+    "vehicleLoan",
+    "businessLoan",
+  ]),
   term: z.number().min(1, "Prazo é obrigatório"),
   includeInsurance: z.boolean().default(false),
   initialContribution: z.number().optional(),

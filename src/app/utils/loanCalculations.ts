@@ -52,16 +52,16 @@ export function calculateLoan(formData: SimulationFormData): LoanSummary {
  * @returns The interest rate as a percentage
  */
 function getInterestRate(
-  productType: "personal" | "housing" | "mobileLease" | "propertyLease",
+  productType: "personalLoan" | "homeLoan" | "vehicleLoan" | "businessLoan",
 ): number {
   const interestRates = {
-    personal: 29.3,
-    housing: 15.5,
-    mobileLease: 18.75,
-    propertyLease: 16.25,
+    personalLoan: 29.3,
+    homeLoan: 15.5,
+    vehicleLoan: 18.75,
+    businessLoan: 16.25,
   };
 
-  return interestRates[productType] || 29.3; // Default to personal loan rate if not found
+  return interestRates[productType] || 29.3; // Default to personalLoan loan rate if not found
 }
 
 /**
@@ -72,14 +72,14 @@ function getInterestRate(
  */
 function calculateProcessingFee(
   amount: number,
-  productType: "personal" | "housing" | "mobileLease" | "propertyLease",
+  productType: "personalLoan" | "homeLoan" | "vehicleLoan" | "businessLoan",
 ): number {
   const baseRate = 0.01; // 1% base rate
   const productMultipliers = {
-    personal: 1,
-    housing: 0.8,
-    mobileLease: 1.2,
-    propertyLease: 1.1,
+    personalLoan: 1,
+    homeLoan: 0.8,
+    vehicleLoan: 1.2,
+    businessLoan: 1.1,
   };
 
   const multiplier = productMultipliers[productType] || 1;

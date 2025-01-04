@@ -8,10 +8,15 @@ export const metadata: Metadata = {
   description: "Simule diferentes tipos de produtos financeiros",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
-  return <>{children}</>;
+}) {
+  return (
+    <html lang="pt-Pt">
+      <body>{children}</body>
+    </html>
+  );
+  // return <>{children}</>
 }
